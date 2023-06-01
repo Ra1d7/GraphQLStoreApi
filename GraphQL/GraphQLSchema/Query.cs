@@ -35,6 +35,7 @@ namespace GraphQL.GraphQLSchema
 
 
         // ------------ Methods ------------
+
         /// <summary>
         /// Registers a new person into the database , this can be a presequite to adding a customer or employee
         /// </summary>
@@ -45,6 +46,10 @@ namespace GraphQL.GraphQLSchema
             _logger.LogInformation($"Registering a new person with name {person.Name}");
             using(var connection = _context.CreateConnection())
             {
+                //check if user already exists
+                bool didAlreadyRegister = (await connection.QueryAsync<int>("SELECT COUNT(*) FROM Person WHERE Email = @Email", new { Email = person.Email })).FirstOrDefault() > 0 ? true : false;
+                if (didAlreadyRegister) return "Email already exists! , please login.";
+                //register user if new
                 int rows = await connection.ExecuteAsync("INSERT INTO Person(Name,Email,Age,Gender) VALUES (@Name,@Email,@Age,@Gender)",person);
                 return rows > 0 ? "Successfully Registered!" : $"An error has occured while registering person \n{JsonSerializer.Serialize(person)}";
             }

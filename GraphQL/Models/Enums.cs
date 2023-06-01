@@ -9,12 +9,12 @@
         }
         public enum Department
         {
-            IT,
-            Sales,
-            HR,
-            Management,
-            Accounting,
-            QA
+            IT = 1,
+            Sales = 2,
+            HR = 3,
+            Management = 4,
+            Accounting = 5,
+            QA = 6
         }
     }
 }

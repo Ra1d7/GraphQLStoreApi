@@ -26,6 +26,8 @@
         public int? Qtn { get; set; }
         public bool? IsAvailble { get; set; } = false;
         public Category Category { get; set; }
+        [GraphQLIgnore]
+        public int CategoryId { get; set; }
 
         // this method can be called straight from the GraphQL Api without adding it to the Query :)
         public string ShortDescription()

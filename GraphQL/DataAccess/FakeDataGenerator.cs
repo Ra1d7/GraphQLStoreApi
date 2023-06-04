@@ -86,7 +86,7 @@ namespace GraphQL.DataAccess
         private static Category GenCategory()
         {
             return new Faker<Category>()
-                .RuleFor(c => c.CategoryId, f => f.Random.Int(1, 100))
+                .RuleFor(c => c.Id, f => f.Random.Int(1, 100))
                 .RuleFor(c => c.Name, f => f.Random.String());
         }
         private static Item GenItem()

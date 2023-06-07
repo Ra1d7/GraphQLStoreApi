@@ -15,6 +15,7 @@
         }
 
         [GraphQLNonNullType]
+        [GraphQLName("Id")]
         public int ItemId { get; set; }
         [GraphQLNonNullType]
         public decimal? Price { get; set; }
@@ -32,7 +33,7 @@
         // this method can be called straight from the GraphQL Api without adding it to the Query :)
         public string ShortDescription()
         {
-            return Description[..50].Replace("\n"," ") + "...";
+            return (Description.Length > 50) ?  Description[..50].Replace("\n"," ") + "..." : Description;
         }
     }
 }

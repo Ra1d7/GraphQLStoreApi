@@ -37,10 +37,10 @@ public class Query
         _logger.LogInformation("Getting Database Employees");
 
         using var connection = _context.CreateConnection();
-        var query = @"SELECT e.PersonId AS id, e.Salary, e.DepartmentId AS Department,
+        var query = @"SELECT e.Id AS id, e.Salary, e.DepartmentId AS Department,
                      p.Name, p.Email, p.JoinDate, p.Age, p.Gender
                      FROM Employee e
-                     JOIN Person p ON e.Personid = p.Id";
+                     JOIN Person p ON e.Id = p.Id";
 
         IEnumerable<Employee> emps = await connection.QueryAsync<Employee>(query);
 
@@ -51,10 +51,10 @@ public class Query
     {
         _logger.LogInformation("Getting Database Customers");
         using var connection = _context.CreateConnection();
-        var query = @"SELECT c.PersonId AS id, c.ShippingAddress, c.HasPremiumMembership,
+        var query = @"SELECT c.Id AS id, c.ShippingAddress, c.HasPremiumMembership,
                      p.Name, p.Email, p.JoinDate, p.Age, p.Gender
                      FROM Customers c
-                     JOIN Person p ON c.Personid = p.Id";
+                     JOIN Person p ON c.Id = p.Id";
         IEnumerable<Customer> customers = await connection.QueryAsync<Customer>(query);
         return customers.Take(num);
     } 

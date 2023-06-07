@@ -1,9 +1,8 @@
-﻿using static GraphQL.Models.Enums;
-using System.Text.Json;
+﻿using Dapper;
 using GraphQL.DataAccess;
-using Dapper;
-using GraphQL.Models;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using static GraphQL.Models.Enums;
 
 namespace GraphQL.Mutations;
 
@@ -23,8 +22,8 @@ public class Mutation
     public record RegisterPersonDTO(string Name, string Email, string Password, int Age, Gender Gender);
     public record RegisterCustomernDTO(string Name, string Email, string Password, int Age, Gender Gender, bool HasPremium = false, string ShippingAddress = "");
     public record RegisterEmployeeDTO(string Name, string Email, string Password, int Age, Gender Gender, decimal Salary, Department Department);
-    public record AddItemDTO(string Name,decimal Price , string Description , int Quantity , bool IsAvaliable , string Category);
-    public record EditItemDTO(string? Name,decimal? Price , string? Description , int? Quantity , bool? IsAvaliable , string? Category);
+    public record AddItemDTO(string Name, decimal Price, string Description, int Quantity, bool IsAvaliable, string Category);
+    public record EditItemDTO(string? Name, decimal? Price, string? Description, int? Quantity, bool? IsAvaliable, string? Category);
     #endregion
     #region Methods
 
@@ -80,7 +79,7 @@ public class Mutation
     {
         _logger.LogInformation($"Adding a new Category {category}");
         using var connection = _context.CreateConnection();
-        int rows = await connection.ExecuteAsync("INSERT INTO Categories VALUES (@category)", new {category });
+        int rows = await connection.ExecuteAsync("INSERT INTO Categories VALUES (@category)", new { category });
         return rows > 0 ? "Sucessfully added!" : "An error has occured while adding a new category";
     }
 
@@ -114,39 +113,39 @@ public class Mutation
     /// <param name="id"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public async Task<string> EditAnItem(int id ,EditItemDTO item)
+    public async Task<string> EditAnItem(int id, EditItemDTO item)
     {
         _logger.LogInformation($"Editing an item with id {id} with a price of");
         int? CategoryId = null;
-        Dictionary<string,object> Properties = new();
-        item.GetType().GetProperties().Where(p => p.GetValue(item) != null).ToList().ForEach(p => Properties.Add(p.Name,p.GetValue(item)!));
+        Dictionary<string, object> Properties = new();
+        item.GetType().GetProperties().Where(p => p.GetValue(item) != null).ToList().ForEach(p => Properties.Add(p.Name, p.GetValue(item)!));
         using var connection = _context.CreateConnection();
         //check category if provided
         if (Properties.ContainsKey("Category"))
         {
-        CategoryId = (await connection.QueryAsync<int>("SELECT Id FROM Categories WHERE Name = @Category", new { Category = item.Category })).FirstOrDefault();
-        if (CategoryId == null) return "Category Doesn't Exist!";
+            CategoryId = (await connection.QueryAsync<int>("SELECT Id FROM Categories WHERE Name = @Category", new { Category = item.Category })).FirstOrDefault();
+            if (CategoryId == null) return "Category Doesn't Exist!";
         }
         if (Properties.ContainsKey("Descrition") && Properties["Description"].ToString().IsNullOrEmpty())
             return "Description cannot be empty";
-        if(Properties.ContainsKey("Name") && Properties["Name"].ToString().IsNullOrEmpty())
+        if (Properties.ContainsKey("Name") && Properties["Name"].ToString().IsNullOrEmpty())
             return "Name cannot be empty";
         if (Properties.ContainsKey("Price") && (decimal)Properties["Price"] <= 0)
             return "Price needs to be above 0";
         int rows = 0;
-        foreach(var prop in Properties)
+        foreach (var prop in Properties)
         {
-        rows += await connection.ExecuteAsync("UPDATE Item SET @PropertyToEdit = @Value WHERE id = @id",
-            new
-            {
-                PropertyToEdit = prop.Key,
-                Value = prop.Value,
-                id = id
-            });
+            rows += await connection.ExecuteAsync("UPDATE Item SET @PropertyToEdit = @Value WHERE id = @id",
+                new
+                {
+                    PropertyToEdit = prop.Key,
+                    Value = prop.Value,
+                    id = id
+                });
         }
         return rows > 0 ? "Successfully edited!" : "An error occured while editing an item";
     }
-    public async Task<string> EditACategory(int id,string category)
+    public async Task<string> EditACategory(int id, string category)
     {
         _logger.LogInformation($"Editing category with id {id}");
         using var connection = _context.CreateConnection();
@@ -181,7 +180,7 @@ public class Mutation
         using var connection = _context.CreateConnection();
         int rows = await connection.ExecuteAsync("DELETE FROM Item WHERE Id = @id", new { id });
         return rows > 0;
-    }  
+    }
     public async Task<bool> DeleteACategory(int id)
     {
         _logger.LogInformation($"Deleting category with id {id}");

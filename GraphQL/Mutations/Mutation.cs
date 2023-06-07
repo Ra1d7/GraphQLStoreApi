@@ -70,11 +70,6 @@ namespace GraphQL.Mutations
             return rows > 0 ? $"Successfully Registered! employee with id of {personid}" : $"An error has occured while registering person \n{JsonSerializer.Serialize(employee)}";
         }
 
-        /// <summary>
-        /// Adds a new category for items in the database
-        /// </summary>
-        /// <param name="category"></param>
-        /// <returns></returns>
         public async Task<string> AddACategory(string category)
         {
             _logger.LogInformation($"Adding a new Category {category}");
@@ -83,11 +78,6 @@ namespace GraphQL.Mutations
             return rows > 0 ? "Sucessfully added!" : "An error has occured while adding a new category";
         }
 
-        /// <summary>
-        /// Adds a new item into the database
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
         public async Task<string> AddAnItem(AddItemDTO item)
         {
             _logger.LogInformation($"Adding a new item {item.Name} with a price of {item.Price}");
@@ -108,6 +98,7 @@ namespace GraphQL.Mutations
                 });
             return rows > 0 ? "Successfully added!" : "An error occured while adding item";
         }
+
         /// <summary>
         /// Provides dynamic editing of an item with the ability to only specifiy the attributes you'd like to edit and the other attributes will stay the same in the database
         /// </summary>
@@ -146,6 +137,13 @@ namespace GraphQL.Mutations
             }
             return rows > 0 ? "Successfully edited!" : "An error occured while editing an item";
         }
+        public async Task<string> EditACategory(int id,string category)
+        {
+            _logger.LogInformation($"Editing category with id {id}");
+            using var connection = _context.CreateConnection();
+            int rows = await connection.ExecuteAsync("UPDATE Categories SET Name = @category WHERE id = @id", new { category, id });
+            return rows > 0 ? "Successfully edited!" : "An error has occured while editing a category";
+        }
 
 
         /// <summary>
@@ -159,11 +157,6 @@ namespace GraphQL.Mutations
             int rows = await connection.ExecuteAsync("DELETE FROM Person");
             return rows > 0;
         }
-        /// <summary>
-        /// Delete a person from the database
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<bool> DeleteAPerson(int id)
         {
             _logger.LogInformation($"Deleting person with id {id}");
@@ -171,11 +164,6 @@ namespace GraphQL.Mutations
             int rows = await connection.ExecuteAsync("DELETE FROM Person WHERE Id = @id", new { id });
             return rows > 0;
         }
-        /// <summary>
-        /// Delete an item from the database
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<bool> DeleteAnItem(int id)
         {
             _logger.LogInformation($"Deleting item with id {id}");
@@ -183,12 +171,6 @@ namespace GraphQL.Mutations
             int rows = await connection.ExecuteAsync("DELETE FROM Item WHERE Id = @id", new { id });
             return rows > 0;
         }  
-
-        /// <summary>
-        /// Delete a category from the database
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<bool> DeleteACategory(int id)
         {
             _logger.LogInformation($"Deleting category with id {id}");
